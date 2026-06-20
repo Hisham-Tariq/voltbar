@@ -23,6 +23,7 @@ xcrun swiftc \
 
 echo "==> Assembling bundle"
 cp "$ROOT/Resources/Info.plist" "$APP/Contents/Info.plist"
+cp "$ROOT/Resources/AppIcon.icns" "$RES/AppIcon.icns"
 
 echo "==> Ad-hoc code signing"
 codesign --force --deep --sign - "$APP"
