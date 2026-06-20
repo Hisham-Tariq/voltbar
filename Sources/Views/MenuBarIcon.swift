@@ -13,11 +13,9 @@ enum MenuBarIcon {
         let boltW: CGFloat = snap.isCharging ? 6.0 : 0
         let boltGap: CGFloat = snap.isCharging ? 1.5 : 0
 
-        // Filled green pill ONLY when on power (charging or plugged in).
-        // On battery → translucent battery outline with the number, color-coded by level.
-        let onPower = snap.isCharging || snap.isACAttached
+        // Battery glyph with a fill level proportional to charge and the % number inside.
         let accent = accentColor(for: snap)
-        let textColor: NSColor = onPower ? .white : accent
+        let textColor: NSColor = .white
 
         let text = "\(max(0, min(100, snap.percent)))"
         let font = NSFont.systemFont(ofSize: 10, weight: .bold)
@@ -41,18 +39,22 @@ enum MenuBarIcon {
                              width: capWidth, height: 5.2)
         let cap = NSBezierPath(roundedRect: capRect, xRadius: 0.8, yRadius: 0.8)
 
-        if onPower {
-            // Filled pill.
-            accent.setFill(); body.fill()
-            accent.withAlphaComponent(0.9).setFill(); cap.fill()
-            NSColor.white.withAlphaComponent(0.22).setStroke()
-            body.lineWidth = 1; body.stroke()
-        } else {
-            // Outline only.
-            accent.withAlphaComponent(0.95).setStroke()
-            body.lineWidth = 1.3; body.stroke()
-            accent.withAlphaComponent(0.95).setFill(); cap.fill()
-        }
+        // Proportional fill: solid up to the charge level, faint for the remainder,
+        // so the icon visually reflects the actual percentage (80% ≠ full).
+        let frac = max(0.04, min(1.0, CGFloat(snap.percent) / 100.0))
+        NSGraphicsContext.saveGraphicsState()
+        body.setClip()
+        accent.withAlphaComponent(0.22).setFill()
+        bodyRect.fill()
+        let levelRect = NSRect(x: bodyRect.minX, y: bodyRect.minY,
+                               width: bodyRect.width * frac, height: bodyRect.height)
+        accent.setFill()
+        levelRect.fill()
+        NSGraphicsContext.restoreGraphicsState()
+
+        accent.withAlphaComponent(0.6).setStroke()
+        body.lineWidth = 1; body.stroke()
+        accent.setFill(); cap.fill()
 
         // Contents: percentage number, then bolt if charging.
         let contentW = textSize.width + boltGap + boltW
@@ -73,7 +75,7 @@ enum MenuBarIcon {
         let green = NSColor(srgbRed: 0.24, green: 0.78, blue: 0.45, alpha: 1)
         if snap.isCharging || snap.isACAttached { return green }
         switch snap.percent {
-        case 20...:   return NSColor.white       // normal on-battery: clean white outline
+        case 20...:   return green
         case 10..<20: return NSColor.systemOrange
         default:      return NSColor.systemRed
         }
