@@ -48,37 +48,38 @@ const features = [
 
     <!-- hero -->
     <main class="mx-auto max-w-5xl px-6">
-      <section class="pt-16 pb-20 text-center">
-        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-neutral-300">
-          <span class="h-1.5 w-1.5 rounded-full bg-volt"></span> Free & open-source · macOS 14+
-        </span>
-        <h1 class="mx-auto mt-6 max-w-3xl text-balance text-5xl font-bold tracking-tight text-white sm:text-6xl">
-          Your Mac battery,<br /><span class="bg-gradient-to-r from-volt to-emerald-300 bg-clip-text text-transparent">beautifully in the menu bar.</span>
-        </h1>
-        <p class="mx-auto mt-6 max-w-xl text-lg text-neutral-400">
-          Live health, temperature, voltage, real-time power flow and Dynamic-Island
-          alerts — a native Swift app that idles at ~0% CPU.
-        </p>
-        <div class="mt-9 flex flex-wrap items-center justify-center gap-4">
-          <a href={release}
-             class="rounded-xl bg-gradient-to-b from-volt to-volt-dim px-6 py-3 font-semibold text-black shadow-lg shadow-volt/20 transition hover:brightness-110">
-            ↓ Download for macOS
-          </a>
-          <a href={repo}
-             class="rounded-xl border border-white/15 px-6 py-3 font-medium text-neutral-200 transition hover:bg-white/5">
-            View source
-          </a>
+      <section class="grid items-center gap-14 pt-12 pb-24 lg:grid-cols-[1.1fr_0.9fr]">
+        <!-- copy -->
+        <div class="text-center lg:text-left">
+          <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-neutral-300">
+            <span class="h-1.5 w-1.5 rounded-full bg-volt"></span> Free & open-source · macOS 14+
+          </span>
+          <h1 class="mt-6 text-balance text-5xl font-bold leading-[1.05] tracking-tight text-white sm:text-6xl">
+            Your Mac battery,<br /><span class="bg-gradient-to-r from-volt to-emerald-300 bg-clip-text text-transparent">beautifully in the menu bar.</span>
+          </h1>
+          <p class="mx-auto mt-6 max-w-xl text-lg text-neutral-400 lg:mx-0">
+            Live health, temperature, voltage, real-time power flow and Dynamic-Island
+            alerts — a native Swift app that idles at ~0% CPU.
+          </p>
+          <div class="mt-9 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
+            <a href={release}
+               class="rounded-xl bg-gradient-to-b from-volt to-volt-dim px-6 py-3 font-semibold text-black shadow-lg shadow-volt/20 transition hover:brightness-110">
+              ↓ Download for macOS
+            </a>
+            <a href={repo}
+               class="rounded-xl border border-white/15 px-6 py-3 font-medium text-neutral-200 transition hover:bg-white/5">
+              View source
+            </a>
+          </div>
+          <p class="mt-4 text-xs text-neutral-500">Apple Silicon · ad-hoc signed · no telemetry</p>
         </div>
-        <p class="mt-4 text-xs text-neutral-500">Apple Silicon · ad-hoc signed · no telemetry</p>
 
         <!-- screenshot -->
-        <div class="mx-auto mt-16 max-w-sm">
-          <div class="rounded-3xl border border-white/10 bg-white/5 p-2 shadow-2xl shadow-black/50 backdrop-blur">
-            <img src="/panel.png" alt="Voltbar panel" class="rounded-2xl"
-                 onerror="this.style.display='none'" />
-            <div class="rounded-2xl p-8 text-sm text-neutral-500" id="shotph">
-              Drop a panel screenshot at <code class="text-neutral-300">site/public/panel.png</code>
-            </div>
+        <div class="relative mx-auto w-full max-w-[300px]">
+          <div aria-hidden="true" class="absolute inset-0 -z-10 scale-110 rounded-[2rem] bg-volt/25 blur-[90px]"></div>
+          <div class="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-2 shadow-2xl shadow-black/60 backdrop-blur">
+            <img src="/panel.png" alt="The Voltbar panel showing battery health, temperature, power flow and capacity"
+                 class="w-full rounded-[1.35rem]" />
           </div>
         </div>
       </section>
