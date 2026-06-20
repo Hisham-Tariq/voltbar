@@ -1,0 +1,138 @@
+---
+import "../styles/global.css";
+
+const repo = "https://github.com/Hisham-Tariq/voltbar";
+const release = `${repo}/releases/latest`;
+
+const features = [
+  { icon: "🔋", title: "Battery Health", body: "Capacity vs. design (can exceed 100%) and cycle count at a glance." },
+  { icon: "🌡️", title: "Temperature", body: "Live °C / °F with normal · warm · hot status." },
+  { icon: "⚡", title: "Power & Electrical", body: "Real-time watts, voltage, current and charge state." },
+  { icon: "🔀", title: "Power Flow", body: "A dynamic curved split — power into the battery vs. the laptop." },
+  { icon: "🔔", title: "Smart Alerts", body: "Low-battery, charged and plug/unplug — as a glowing Dynamic-Island bubble." },
+  { icon: "🪶", title: "Featherweight", body: "Event-driven, no polling, no network. Idles at ~0% CPU." },
+];
+---
+
+<!doctype html>
+<html lang="en" class="bg-[#0b0d0c] text-neutral-200 antialiased">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Voltbar — a native battery panel for your Mac menu bar</title>
+    <meta name="description" content="Voltbar is a free, open-source macOS menu-bar app showing live battery health, temperature, power flow and Dynamic-Island alerts. Native Swift, ~0% idle CPU." />
+    <meta property="og:title" content="Voltbar — battery panel for the Mac menu bar" />
+    <meta property="og:description" content="Live battery health, power flow and alerts. Native, open-source, ~0% idle CPU." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://voltbar.hishamtariq.com" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="relative overflow-x-hidden">
+    <!-- ambient glow -->
+    <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-[-12rem] -z-10 flex justify-center">
+      <div class="h-[28rem] w-[44rem] rounded-full bg-volt/20 blur-[140px]"></div>
+    </div>
+
+    <!-- nav -->
+    <header class="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
+      <div class="flex items-center gap-2 font-semibold tracking-tight">
+        <span class="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-b from-volt to-volt-dim text-black">⚡</span>
+        Voltbar
+      </div>
+      <nav class="flex items-center gap-6 text-sm text-neutral-400">
+        <a href="#features" class="hover:text-white">Features</a>
+        <a href="#install" class="hover:text-white">Install</a>
+        <a href={repo} class="hover:text-white">GitHub</a>
+      </nav>
+    </header>
+
+    <!-- hero -->
+    <main class="mx-auto max-w-5xl px-6">
+      <section class="pt-16 pb-20 text-center">
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-neutral-300">
+          <span class="h-1.5 w-1.5 rounded-full bg-volt"></span> Free & open-source · macOS 14+
+        </span>
+        <h1 class="mx-auto mt-6 max-w-3xl text-balance text-5xl font-bold tracking-tight text-white sm:text-6xl">
+          Your Mac battery,<br /><span class="bg-gradient-to-r from-volt to-emerald-300 bg-clip-text text-transparent">beautifully in the menu bar.</span>
+        </h1>
+        <p class="mx-auto mt-6 max-w-xl text-lg text-neutral-400">
+          Live health, temperature, voltage, real-time power flow and Dynamic-Island
+          alerts — a native Swift app that idles at ~0% CPU.
+        </p>
+        <div class="mt-9 flex flex-wrap items-center justify-center gap-4">
+          <a href={release}
+             class="rounded-xl bg-gradient-to-b from-volt to-volt-dim px-6 py-3 font-semibold text-black shadow-lg shadow-volt/20 transition hover:brightness-110">
+            ↓ Download for macOS
+          </a>
+          <a href={repo}
+             class="rounded-xl border border-white/15 px-6 py-3 font-medium text-neutral-200 transition hover:bg-white/5">
+            View source
+          </a>
+        </div>
+        <p class="mt-4 text-xs text-neutral-500">Apple Silicon · ad-hoc signed · no telemetry</p>
+
+        <!-- screenshot -->
+        <div class="mx-auto mt-16 max-w-sm">
+          <div class="rounded-3xl border border-white/10 bg-white/5 p-2 shadow-2xl shadow-black/50 backdrop-blur">
+            <img src="/panel.png" alt="Voltbar panel" class="rounded-2xl"
+                 onerror="this.style.display='none'" />
+            <div class="rounded-2xl p-8 text-sm text-neutral-500" id="shotph">
+              Drop a panel screenshot at <code class="text-neutral-300">site/public/panel.png</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- features -->
+      <section id="features" class="py-16">
+        <h2 class="text-center text-3xl font-bold tracking-tight text-white">Everything, at a glance</h2>
+        <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-volt/30 hover:bg-white/[0.05]">
+              <div class="text-2xl">{f.icon}</div>
+              <h3 class="mt-4 font-semibold text-white">{f.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-neutral-400">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- install -->
+      <section id="install" class="py-16">
+        <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-8 sm:p-12">
+          <h2 class="text-3xl font-bold tracking-tight text-white">Get started</h2>
+          <div class="mt-8 grid gap-8 md:grid-cols-2">
+            <div>
+              <h3 class="font-semibold text-white">Download</h3>
+              <ol class="mt-3 space-y-2 text-sm text-neutral-400">
+                <li>1. Grab <code class="text-neutral-200">Voltbar.zip</code> from the <a href={release} class="text-volt hover:underline">latest release</a>.</li>
+                <li>2. Move <strong class="text-neutral-200">Voltbar.app</strong> to Applications.</li>
+                <li>3. Right-click → <strong class="text-neutral-200">Open</strong> on first launch.</li>
+              </ol>
+              <pre class="mt-4 overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-4 text-xs text-neutral-300"><code>xattr -dr com.apple.quarantine /Applications/Voltbar.app</code></pre>
+            </div>
+            <div>
+              <h3 class="font-semibold text-white">Build from source</h3>
+              <pre class="mt-3 overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-4 text-xs text-neutral-300"><code>git clone {repo}.git
+cd voltbar
+./build.sh
+open build/Voltbar.app</code></pre>
+              <p class="mt-3 text-sm text-neutral-500">Requires the Swift toolchain on Apple Silicon, macOS 14+.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mx-auto max-w-5xl px-6 py-12 text-sm text-neutral-500">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-8">
+        <span>⚡ Voltbar · MIT License</span>
+        <div class="flex gap-6">
+          <a href={repo} class="hover:text-white">GitHub</a>
+          <a href={`${repo}/issues`} class="hover:text-white">Issues</a>
+          <a href="https://hishamtariq.com" class="hover:text-white">Hisham Tariq</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

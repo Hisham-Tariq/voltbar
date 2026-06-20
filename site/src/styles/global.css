@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+  --color-volt: #4ade80;
+  --color-volt-dim: #3fae6a;
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}

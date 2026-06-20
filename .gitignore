@@ -1,0 +1,26 @@
+# Build output
+build/
+*.app
+*.zip
+*.dmg
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Xcode / SwiftPM (in case added later)
+.build/
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Tooling state
+.omc/
