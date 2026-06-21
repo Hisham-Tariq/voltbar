@@ -9,7 +9,7 @@ Dynamic-Island-style alerts — built in pure Swift + SwiftUI + IOKit. No Electr
 no telemetry, no network, idles at ~0% CPU.
 
 [Download](https://github.com/Hisham-Tariq/voltbar/releases/latest) ·
-[Website](https://hisham-tariq.github.io/voltbar/) ·
+[Website](https://voltbar.hishamtariq.com) ·
 [Report a bug](https://github.com/Hisham-Tariq/voltbar/issues)
 
 </div>
