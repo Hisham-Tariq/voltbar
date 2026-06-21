@@ -24,8 +24,9 @@ struct PowerFlowView: View {
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.textSecondary)
         }
-        .onChange(of: panelVisible) { _, vis in if vis { startShimmer() } else { phase = 0 } }
+        .onChange(of: panelVisible) { _, vis in if vis { startShimmer() } else { stopShimmer() } }
         .onAppear { if panelVisible { startShimmer() } }
+        .onDisappear { stopShimmer() }
     }
 
     private var header: some View {
@@ -123,12 +124,13 @@ struct PowerFlowView: View {
                           animated: Bool, big: Bool = false) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12, style: .continuous).fill(tint)
-            if animated {
+            // Only place the moving sheen in the tree while the panel is visible, so it
+            // leaves the hierarchy (and stops animating) the moment the panel closes.
+            if animated && panelVisible {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(LinearGradient(colors: [.clear, Theme.green.opacity(0.16), .clear],
                                          startPoint: .leading, endPoint: .trailing))
                     .offset(x: phase)
-                    .opacity(panelVisible ? 1 : 0)
             }
             Text(text)
                 .font(.system(size: big ? 17 : 15, weight: .bold, design: .rounded))
@@ -141,6 +143,16 @@ struct PowerFlowView: View {
     private func startShimmer() {
         phase = -110
         withAnimation(.linear(duration: 2.2).repeatForever(autoreverses: false)) { phase = 110 }
+    }
+
+    /// Cancel the repeating animation. A plain `phase = 0` does NOT stop a `.repeatForever`
+    /// animator — it keeps re-rendering the (now hidden) menu-bar window every frame, which is
+    /// what pushed idle CPU to ~3-4%. Overriding it with an explicit zero-duration animation
+    /// removes the animator so the run loop can actually sleep.
+    private func stopShimmer() {
+        var tx = Transaction(animation: .linear(duration: 0))
+        tx.disablesAnimations = true
+        withTransaction(tx) { phase = 0 }
     }
 }
 
