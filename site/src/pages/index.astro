@@ -5,134 +5,216 @@ const repo = "https://github.com/Hisham-Tariq/voltbar";
 const release = `${repo}/releases/latest`;
 const dmg = `${repo}/releases/latest/download/Voltbar.dmg`;
 
+// Proof band — why it's light, stated as measurements.
+const band = [
+  { v: "~0.0", u: "% idle CPU", note: "event-driven, no polling" },
+  { v: "0",    u: "KB network", note: "zero telemetry, ever" },
+  { v: "0",    u: "dependencies", note: "pure Swift + IOKit" },
+  { v: "100",  u: "% native", note: "no Electron, no web view" },
+];
+
 const features = [
-  { icon: "🔋", title: "Battery Health", body: "Capacity vs. design (can exceed 100%) and cycle count at a glance." },
-  { icon: "🌡️", title: "Temperature", body: "Live °C / °F with normal · warm · hot status." },
-  { icon: "⚡", title: "Power & Electrical", body: "Real-time watts, voltage, current and charge state." },
-  { icon: "🔀", title: "Power Flow", body: "A dynamic curved split — power into the battery vs. the laptop." },
-  { icon: "🔔", title: "Smart Alerts", body: "Low-battery, charged and plug/unplug — as a glowing Dynamic-Island bubble." },
-  { icon: "🪶", title: "Featherweight", body: "Event-driven, no polling, no network. Idles at ~0% CPU." },
+  { n: "01", tag: "%",  title: "Battery Health", body: "Capacity vs. design — can read past 100% — with live cycle count.",
+    path: "M7 9a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2zM20 10v4M11 9l-2 6h3l-1.5 4 4-7h-3z" },
+  { n: "02", tag: "°C", title: "Temperature", body: "Cell temperature in °C / °F with a normal · warm · hot verdict.",
+    path: "M12 4a2 2 0 0 1 2 2v7.5a3.5 3.5 0 1 1-4 0V6a2 2 0 0 1 2-2zM12 12v4" },
+  { n: "03", tag: "W",  title: "Power & Electrical", body: "Real-time watts, voltage, current draw and the exact charge state.",
+    path: "M13 3 5 14h6l-1 7 8-11h-6z" },
+  { n: "04", tag: "⌁",  title: "Power Flow", body: "A curved split, drawn live — energy into the cell vs. into the machine.",
+    path: "M3 12c3 0 3-6 6-6s3 12 6 12 3-6 6-6" },
+  { n: "05", tag: "Hz", title: "Smart Alerts", body: "Low, charged and plug events — a glowing Dynamic-Island bubble, each previewable.",
+    path: "M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6M10 20a2 2 0 0 0 4 0" },
+  { n: "06", tag: "g",  title: "Featherweight", body: "Visibility-gated reads, sleep/wake aware, idle at effectively zero cost.",
+    path: "M19 5c-7 0-12 5-12 12l1 1c7 0 11-5 11-13zM7 17 4 20M14 9l-4 4" },
 ];
 ---
 
 <!doctype html>
-<html lang="en" class="bg-[#0b0d0c] text-neutral-200 antialiased">
+<html lang="en" class="bg-ink text-fg antialiased font-sans">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Voltbar — a native battery panel for your Mac menu bar</title>
-    <meta name="description" content="Voltbar is a free, open-source macOS menu-bar app showing live battery health, temperature, power flow and Dynamic-Island alerts. Native Swift, ~0% idle CPU." />
-    <meta property="og:title" content="Voltbar — battery panel for the Mac menu bar" />
-    <meta property="og:description" content="Live battery health, power flow and alerts. Native, open-source, ~0% idle CPU." />
+    <title>Voltbar — a battery instrument for your Mac menu bar</title>
+    <meta name="description" content="Voltbar is a free, open-source macOS menu-bar app that reads your battery like a bench instrument: live health, temperature, power flow and Dynamic-Island alerts. Native Swift, ~0% idle CPU." />
+    <meta property="og:title" content="Voltbar — battery instrument for the Mac menu bar" />
+    <meta property="og:description" content="Read your Mac's battery like an instrument. Native, open-source, ~0% idle CPU." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://voltbar.hishamtariq.com" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
-  <body class="relative overflow-x-hidden">
-    <!-- ambient glow -->
-    <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-[-12rem] -z-10 flex justify-center">
-      <div class="h-[28rem] w-[44rem] rounded-full bg-volt/20 blur-[140px]"></div>
-    </div>
+
+  <body class="relative min-h-screen">
+    <!-- instrument substrate: graticule + vignette, fixed behind everything -->
+    <div aria-hidden="true" class="graticule pointer-events-none fixed inset-0 -z-20"></div>
+    <div aria-hidden="true" class="scope-vignette pointer-events-none fixed inset-0 -z-10"></div>
 
     <!-- nav -->
-    <header class="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
-      <div class="flex items-center gap-2 font-semibold tracking-tight">
-        <span class="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-b from-volt to-volt-dim text-black">⚡</span>
-        Voltbar
-      </div>
-      <nav class="flex items-center gap-6 text-sm text-neutral-400">
-        <a href="#features" class="hover:text-white">Features</a>
-        <a href="#install" class="hover:text-white">Install</a>
-        <a href={repo} class="hover:text-white">GitHub</a>
+    <header class="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+      <a href="/" class="flex items-center gap-2.5">
+        <span class="grid h-7 w-7 place-items-center rounded-md border border-volt/40 bg-volt/10 text-volt">
+          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="currentColor"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></svg>
+        </span>
+        <span class="font-mono text-sm font-medium tracking-tight text-fg">voltbar</span>
+      </a>
+      <nav class="flex items-center gap-7 font-mono text-xs text-fg-dim">
+        <a href="#spec" class="hover:text-volt transition">spec</a>
+        <a href="#install" class="hover:text-volt transition">install</a>
+        <a href={repo} class="hover:text-volt transition">source ↗</a>
       </nav>
     </header>
 
-    <!-- hero -->
-    <main class="mx-auto max-w-5xl px-6">
-      <section class="grid items-center gap-14 pt-12 pb-24 lg:grid-cols-[1.1fr_0.9fr]">
-        <!-- copy -->
-        <div class="text-center lg:text-left">
-          <span class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-neutral-300">
-            <span class="h-1.5 w-1.5 rounded-full bg-volt"></span> Free & open-source · macOS 14+
-          </span>
-          <h1 class="mt-6 text-balance text-5xl font-bold leading-[1.05] tracking-tight text-white sm:text-6xl">
-            Your Mac battery,<br /><span class="bg-gradient-to-r from-volt to-emerald-300 bg-clip-text text-transparent">beautifully in the menu bar.</span>
+    <main class="mx-auto max-w-6xl px-6">
+      <!-- ── HERO ─────────────────────────────────────────────────────────── -->
+      <section class="grid items-center gap-12 pt-10 pb-20 lg:grid-cols-[1.05fr_0.95fr] lg:pt-16">
+        <div>
+          <div class="rise font-mono text-xs uppercase tracking-[0.2em] text-volt" style="animation-delay:.05s">
+            // menu-bar instrument · macOS 14+
+          </div>
+
+          <h1 class="rise mt-5 text-balance text-[2.7rem] font-bold leading-[1.04] tracking-tight text-fg sm:text-6xl" style="animation-delay:.12s">
+            Read your Mac's battery<br />
+            <span class="text-volt-bright">like an instrument.</span>
           </h1>
-          <p class="mx-auto mt-6 max-w-xl text-lg text-neutral-400 lg:mx-0">
-            Live health, temperature, voltage, real-time power flow and Dynamic-Island
-            alerts — a native Swift app that idles at ~0% CPU.
+
+          <p class="rise mt-6 max-w-md text-[1.05rem] leading-relaxed text-fg-dim" style="animation-delay:.2s">
+            Health, temperature, voltage, current and real-time power flow —
+            measured straight from the silicon and laid out in your menu bar.
+            A native Swift app that idles at <span class="text-fg">~0% CPU</span>.
           </p>
-          <div class="mt-9 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
+
+          <!-- signature: the scope trace draws itself on load -->
+          <div class="rise mt-8 max-w-md" style="animation-delay:.28s">
+            <svg viewBox="0 0 560 130" class="w-full" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="var(--color-volt)" stop-opacity="0.22" />
+                  <stop offset="1" stop-color="var(--color-volt)" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="100" x2="560" y2="100" stroke="var(--color-grid-strong)" stroke-width="1" />
+              <line x1="0" y1="55"  x2="560" y2="55"  stroke="var(--color-grid)" stroke-width="1" />
+              <path d="M0,95 C70,95 80,60 140,58 S250,30 300,72 S400,18 470,46 S540,82 560,40 L560,130 L0,130 Z" fill="url(#fill)" />
+              <path id="scope" d="M0,95 C70,95 80,60 140,58 S250,30 300,72 S400,18 470,46 S540,82 560,40"
+                    class="trace-draw" stroke="var(--color-volt)" stroke-width="2.5" stroke-linecap="round" />
+              <circle r="4" fill="var(--color-volt-bright)">
+                <animateMotion dur="2.1s" begin="0.2s" fill="freeze" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
+                  <mpath href="#scope" />
+                </animateMotion>
+              </circle>
+            </svg>
+            <div class="mt-1 flex justify-between font-mono text-[0.65rem] uppercase tracking-wider text-fg-faint">
+              <span>power flow</span><span>charge → cell</span>
+            </div>
+          </div>
+
+          <div class="rise mt-9 flex flex-wrap items-center gap-3" style="animation-delay:.36s">
             <a href={dmg}
-               class="rounded-xl bg-gradient-to-b from-volt to-volt-dim px-6 py-3 font-semibold text-black shadow-lg shadow-volt/20 transition hover:brightness-110">
-              ↓ Download for macOS
+               class="group inline-flex items-center gap-2 rounded-lg bg-volt px-5 py-3 font-mono text-sm font-semibold text-ink transition hover:bg-volt-bright">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>
+              download .dmg
             </a>
             <a href={repo}
-               class="rounded-xl border border-white/15 px-6 py-3 font-medium text-neutral-200 transition hover:bg-white/5">
-              View source
+               class="inline-flex items-center gap-2 rounded-lg border border-hair px-5 py-3 font-mono text-sm text-fg transition hover:border-volt/40 hover:text-volt">
+              view source
             </a>
           </div>
-          <p class="mt-4 text-xs text-neutral-500">Apple Silicon · ad-hoc signed · no telemetry</p>
+          <p class="rise mt-4 font-mono text-xs text-fg-faint" style="animation-delay:.42s">apple silicon · ad-hoc signed · no telemetry</p>
         </div>
 
-        <!-- screenshot -->
-        <div class="relative mx-auto w-full max-w-[300px]">
-          <div aria-hidden="true" class="absolute inset-0 -z-10 scale-110 rounded-[2rem] bg-volt/25 blur-[90px]"></div>
-          <div class="overflow-hidden rounded-[1.6rem] border border-white/10 shadow-2xl shadow-black/60">
-            <img src="/panel.png" alt="The Voltbar panel showing battery health, temperature, power flow and capacity"
-                 class="block w-full" />
+        <!-- screenshot in an instrument bezel -->
+        <div class="rise relative mx-auto w-full max-w-[320px]" style="animation-delay:.3s">
+          <div class="tick relative rounded-2xl border border-hair bg-panel p-3">
+            <span class="tick-b"></span>
+            <div class="mb-2.5 flex items-center justify-between px-1 font-mono text-[0.65rem] uppercase tracking-wider text-fg-faint">
+              <span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-volt"></span>live</span>
+              <span>voltbar.panel</span>
+            </div>
+            <div class="overflow-hidden rounded-xl border border-hair">
+              <img src="/panel.png" width="640" height="1280" loading="eager"
+                   alt="The Voltbar panel: battery health, temperature, power flow and capacity"
+                   class="block w-full" />
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- features -->
-      <section id="features" class="py-16">
-        <h2 class="text-center text-3xl font-bold tracking-tight text-white">Everything, at a glance</h2>
-        <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => (
-            <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-volt/30 hover:bg-white/[0.05]">
-              <div class="text-2xl">{f.icon}</div>
-              <h3 class="mt-4 font-semibold text-white">{f.title}</h3>
-              <p class="mt-2 text-sm leading-relaxed text-neutral-400">{f.body}</p>
+      <!-- ── PROOF BAND ───────────────────────────────────────────────────── -->
+      <section class="border-y border-hair">
+        <dl class="grid grid-cols-2 divide-x divide-y divide-hair sm:grid-cols-4 sm:divide-y-0">
+          {band.map((b) => (
+            <div class="px-5 py-7">
+              <dt class="font-mono text-2xl font-medium text-fg sm:text-3xl">
+                {b.v}<span class="ml-1 text-sm text-volt">{b.u}</span>
+              </dt>
+              <dd class="mt-2 font-mono text-[0.7rem] uppercase tracking-wider text-fg-faint">{b.note}</dd>
             </div>
+          ))}
+        </dl>
+      </section>
+
+      <!-- ── SPEC LIST ────────────────────────────────────────────────────── -->
+      <section id="spec" class="py-20">
+        <div class="flex items-end justify-between">
+          <h2 class="text-3xl font-bold tracking-tight text-fg">On the readout</h2>
+          <span class="hidden font-mono text-xs uppercase tracking-wider text-fg-faint sm:block">06 channels</span>
+        </div>
+
+        <div class="mt-10 grid border-t border-hair sm:grid-cols-2">
+          {features.map((f, i) => (
+            <article class={`tick group relative flex gap-5 border-b border-hair px-1 py-7 sm:px-6 ${i % 2 === 0 ? "sm:border-r" : ""}`}>
+              <div class="font-mono text-sm text-volt/70">{f.n}</div>
+              <div class="flex-1">
+                <div class="flex items-center gap-3">
+                  <svg viewBox="0 0 24 24" class="h-5 w-5 shrink-0 text-fg-dim transition group-hover:text-volt" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d={f.path}/></svg>
+                  <h3 class="font-semibold text-fg">{f.title}</h3>
+                  <span class="ml-auto font-mono text-xs text-fg-faint">{f.tag}</span>
+                </div>
+                <p class="mt-2.5 text-sm leading-relaxed text-fg-dim">{f.body}</p>
+              </div>
+            </article>
           ))}
         </div>
       </section>
 
-      <!-- install -->
-      <section id="install" class="py-16">
-        <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-8 sm:p-12">
-          <h2 class="text-3xl font-bold tracking-tight text-white">Get started</h2>
-          <div class="mt-8 grid gap-8 md:grid-cols-2">
-            <div>
-              <h3 class="font-semibold text-white">Download</h3>
-              <ol class="mt-3 space-y-2 text-sm text-neutral-400">
-                <li>1. Download <a href={dmg} class="text-volt hover:underline">Voltbar.dmg</a> and open it.</li>
-                <li>2. Drag <strong class="text-neutral-200">Voltbar</strong> onto the <strong class="text-neutral-200">Applications</strong> shortcut.</li>
-                <li>3. Right-click Voltbar → <strong class="text-neutral-200">Open</strong> on first launch.</li>
-              </ol>
-              <pre class="mt-4 overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-4 text-xs text-neutral-300"><code>xattr -dr com.apple.quarantine /Applications/Voltbar.app</code></pre>
-            </div>
-            <div>
-              <h3 class="font-semibold text-white">Build from source</h3>
-              <pre class="mt-3 overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-4 text-xs text-neutral-300"><code>git clone {repo}.git
-cd voltbar
-./build.sh
-open build/Voltbar.app</code></pre>
-              <p class="mt-3 text-sm text-neutral-500">Requires the Swift toolchain on Apple Silicon, macOS 14+.</p>
-            </div>
+      <!-- ── INSTALL ──────────────────────────────────────────────────────── -->
+      <section id="install" class="pb-24">
+        <h2 class="text-3xl font-bold tracking-tight text-fg">Wire it up</h2>
+        <div class="mt-8 grid gap-px overflow-hidden rounded-2xl border border-hair bg-hair md:grid-cols-2">
+          <!-- download path -->
+          <div class="bg-ink-2 p-7 sm:p-9">
+            <div class="font-mono text-xs uppercase tracking-wider text-volt">path A · download</div>
+            <ol class="mt-5 space-y-4 text-sm text-fg-dim">
+              <li class="flex gap-3"><span class="font-mono text-fg-faint">01</span><span>Grab <a href={dmg} class="text-volt underline decoration-volt/40 underline-offset-4 hover:decoration-volt">Voltbar.dmg</a> from the latest release and open it.</span></li>
+              <li class="flex gap-3"><span class="font-mono text-fg-faint">02</span><span>Drag <span class="text-fg">Voltbar</span> onto the <span class="text-fg">Applications</span> shortcut.</span></li>
+              <li class="flex gap-3"><span class="font-mono text-fg-faint">03</span><span>First launch: right-click <span class="text-fg">Voltbar → Open</span>.</span></li>
+            </ol>
+            <pre class="mt-6 overflow-x-auto rounded-lg border border-hair bg-ink p-4 font-mono text-xs leading-relaxed text-fg-dim"><code><span class="text-fg-faint"># if macOS still blocks it</span>
+xattr -dr com.apple.quarantine /Applications/Voltbar.app</code></pre>
+          </div>
+          <!-- build path -->
+          <div class="bg-ink-2 p-7 sm:p-9">
+            <div class="font-mono text-xs uppercase tracking-wider text-volt">path B · build</div>
+            <p class="mt-5 text-sm text-fg-dim">Swift toolchain on Apple Silicon, macOS 14+.</p>
+            <pre class="mt-5 overflow-x-auto rounded-lg border border-hair bg-ink p-4 font-mono text-xs leading-relaxed text-fg-dim"><code><span class="text-volt">$</span> git clone {repo}.git
+<span class="text-volt">$</span> cd voltbar
+<span class="text-volt">$</span> ./build.sh        <span class="text-fg-faint"># → build/Voltbar.app, signed</span>
+<span class="text-volt">$</span> open build/Voltbar.app</code></pre>
+            <p class="mt-5 font-mono text-xs text-fg-faint">A Voltbar.zip is attached to each release too.</p>
           </div>
         </div>
       </section>
     </main>
 
-    <footer class="mx-auto max-w-5xl px-6 py-12 text-sm text-neutral-500">
-      <div class="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-8">
-        <span>⚡ Voltbar · MIT License</span>
+    <footer class="border-t border-hair">
+      <div class="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-8 font-mono text-xs text-fg-faint sm:flex-row sm:items-center sm:justify-between">
+        <span class="flex items-center gap-2"><span class="text-volt">⌁</span> voltbar · MIT · independent open source</span>
         <div class="flex gap-6">
-          <a href={repo} class="hover:text-white">GitHub</a>
-          <a href={`${repo}/issues`} class="hover:text-white">Issues</a>
-          <a href="https://hishamtariq.com" class="hover:text-white">Hisham Tariq</a>
+          <a href={repo} class="hover:text-volt transition">github</a>
+          <a href={`${repo}/issues`} class="hover:text-volt transition">issues</a>
+          <a href="https://hishamtariq.com" class="hover:text-volt transition">hisham tariq ↗</a>
         </div>
       </div>
     </footer>

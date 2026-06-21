@@ -1,12 +1,117 @@
 @import "tailwindcss";
 
+/* ───────────────────────────────────────────────────────────────────────────
+   Voltbar — "lab-bench instrument" design tokens.
+   Governing metaphor: an oscilloscope / multimeter readout. Every decision
+   (graticule substrate, phosphor-green accent as scarce ink, value/unit
+   monospace readouts, hairline rules) answers to that one idea.
+   ─────────────────────────────────────────────────────────────────────────── */
 @theme {
-  --color-volt: #4ade80;
-  --color-volt-dim: #3fae6a;
-  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+  /* substrate — near-black with a cold green cast, never pure #000 */
+  --color-ink: #060807;
+  --color-ink-2: #0a0e0c;
+  --color-panel: #0d1210;
+
+  /* phosphor accent (matches the app's NSColor 0.24/0.78/0.45) */
+  --color-volt: #3ec872;
+  --color-volt-bright: #5df593;
+  --color-volt-dim: #2f9f5a;
+
+  /* graticule + hairlines */
+  --color-grid: rgba(62, 200, 114, 0.06);
+  --color-grid-strong: rgba(62, 200, 114, 0.12);
+  --color-hair: rgba(255, 255, 255, 0.08);
+
+  /* text */
+  --color-fg: #d7e0db;
+  --color-fg-dim: #8b948f;
+  --color-fg-faint: #5c655f;
+
+  --font-sans: "IBM Plex Sans", ui-sans-serif, -apple-system, BlinkMacSystemFont,
     system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 html {
   scroll-behavior: smooth;
+  background: var(--color-ink);
+}
+
+/* ── Oscilloscope graticule: fine grid + a brighter major every 5th line.
+   Atmosphere from structure, not decoration. ── */
+.graticule {
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px),
+    linear-gradient(var(--color-grid-strong) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid-strong) 1px, transparent 1px);
+  background-size:
+    32px 32px,
+    32px 32px,
+    160px 160px,
+    160px 160px;
+  background-position: center;
+}
+
+/* vignette so the grid fades into the bezel edges */
+.scope-vignette {
+  background:
+    radial-gradient(120% 90% at 50% 0%, transparent 55%, var(--color-ink) 100%),
+    radial-gradient(100% 120% at 50% 100%, transparent 50%, var(--color-ink) 100%);
+}
+
+/* corner ticks — instrument bezel registration marks */
+.tick::before,
+.tick::after,
+.tick > .tick-b::before,
+.tick > .tick-b::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--color-volt);
+  opacity: 0.55;
+}
+.tick::before { top: -1px; left: -1px; border-top: 1.5px solid; border-left: 1.5px solid; }
+.tick::after { top: -1px; right: -1px; border-top: 1.5px solid; border-right: 1.5px solid; }
+.tick > .tick-b::before { bottom: -1px; left: -1px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+.tick > .tick-b::after { bottom: -1px; right: -1px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+/* ── One orchestrated motion moment: the scope trace draws itself on load,
+   then staged content fades up. CSS-first, reduced-motion safe. ── */
+.trace-draw {
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: trace 2.1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+}
+@keyframes trace {
+  to { stroke-dashoffset: 0; }
+}
+
+.rise {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* sweep dot that rides the trace */
+.sweep-dot {
+  animation: sweep 2.1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+  opacity: 0;
+}
+@keyframes sweep {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { opacity: 0; offset-distance: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace-draw { animation: none; stroke-dashoffset: 0; }
+  .rise { animation: none; opacity: 1; transform: none; }
+  .sweep-dot { animation: none; opacity: 0; }
+  html { scroll-behavior: auto; }
 }
