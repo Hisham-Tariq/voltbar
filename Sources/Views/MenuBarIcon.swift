@@ -19,9 +19,15 @@ enum MenuBarIcon {
 
         let text = "\(max(0, min(100, snap.percent)))"
         let font = NSFont.systemFont(ofSize: 10, weight: .bold)
+        // Dark halo keeps the white number legible over a light (white) fill too.
+        let shadow = NSShadow()
+        shadow.shadowColor = NSColor.black.withAlphaComponent(0.5)
+        shadow.shadowBlurRadius = 1.5
+        shadow.shadowOffset = .zero
         let textAttrs: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: textColor,
+            .shadow: shadow,
         ]
         let textSize = (text as NSString).size(withAttributes: textAttrs)
 
@@ -75,7 +81,7 @@ enum MenuBarIcon {
         let green = NSColor(srgbRed: 0.24, green: 0.78, blue: 0.45, alpha: 1)
         if snap.isCharging || snap.isACAttached { return green }
         switch snap.percent {
-        case 20...:   return green
+        case 20...:   return NSColor.white       // discharging (normal) → white
         case 10..<20: return NSColor.systemOrange
         default:      return NSColor.systemRed
         }
