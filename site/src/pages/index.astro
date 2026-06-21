@@ -3,6 +3,7 @@ import "../styles/global.css";
 
 const repo = "https://github.com/Hisham-Tariq/voltbar";
 const release = `${repo}/releases/latest`;
+const dmg = `${repo}/releases/latest/download/Voltbar.dmg`;
 
 const features = [
   { icon: "🔋", title: "Battery Health", body: "Capacity vs. design (can exceed 100%) and cycle count at a glance." },
@@ -62,7 +63,7 @@ const features = [
             alerts — a native Swift app that idles at ~0% CPU.
           </p>
           <div class="mt-9 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
-            <a href={release}
+            <a href={dmg}
                class="rounded-xl bg-gradient-to-b from-volt to-volt-dim px-6 py-3 font-semibold text-black shadow-lg shadow-volt/20 transition hover:brightness-110">
               ↓ Download for macOS
             </a>
@@ -106,9 +107,9 @@ const features = [
             <div>
               <h3 class="font-semibold text-white">Download</h3>
               <ol class="mt-3 space-y-2 text-sm text-neutral-400">
-                <li>1. Grab <code class="text-neutral-200">Voltbar.zip</code> from the <a href={release} class="text-volt hover:underline">latest release</a>.</li>
-                <li>2. Move <strong class="text-neutral-200">Voltbar.app</strong> to Applications.</li>
-                <li>3. Right-click → <strong class="text-neutral-200">Open</strong> on first launch.</li>
+                <li>1. Download <a href={dmg} class="text-volt hover:underline">Voltbar.dmg</a> and open it.</li>
+                <li>2. Drag <strong class="text-neutral-200">Voltbar</strong> onto the <strong class="text-neutral-200">Applications</strong> shortcut.</li>
+                <li>3. Right-click Voltbar → <strong class="text-neutral-200">Open</strong> on first launch.</li>
               </ol>
               <pre class="mt-4 overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-4 text-xs text-neutral-300"><code>xattr -dr com.apple.quarantine /Applications/Voltbar.app</code></pre>
             </div>

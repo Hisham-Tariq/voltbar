@@ -42,13 +42,15 @@ Observed: **~0.0% idle CPU** with the panel closed.
 ## Install
 
 ### Download (easiest)
-1. Grab `Voltbar.zip` from the [latest release](https://github.com/Hisham-Tariq/voltbar/releases/latest).
-2. Unzip and move **Voltbar.app** to `/Applications`.
-3. First launch: right-click the app → **Open** (the build is ad-hoc signed, not notarized).
+1. Download **[Voltbar.dmg](https://github.com/Hisham-Tariq/voltbar/releases/latest/download/Voltbar.dmg)** from the latest release and open it.
+2. Drag **Voltbar** onto the **Applications** shortcut in the window.
+3. First launch: right-click Voltbar → **Open** (the build is ad-hoc signed, not notarized).
    If macOS still blocks it, run once:
    ```bash
    xattr -dr com.apple.quarantine /Applications/Voltbar.app
    ```
+
+> A `Voltbar.zip` is also attached to each release if you prefer that.
 
 ### Build from source
 Requires the Swift toolchain (Xcode or Command Line Tools) on Apple Silicon, macOS 14+.
